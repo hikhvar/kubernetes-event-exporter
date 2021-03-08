@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/opsgenie/kubernetes-event-exporter/pkg/kube"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -154,7 +155,8 @@ func (e *Elasticsearch) Send(ctx context.Context, ev *kube.EnhancedEvent) error 
 	}
 
 	defer resp.Body.Close()
-	_ = resp.Body
+	body, err := ioutil.ReadAll(resp.Body)
+	log.Debug().Err(err).Str("index", req.Index).Str("document", string(toSend)).Str("body", string(body)).Msg("got response from elasticsearch sink")
 	return nil
 }
 
